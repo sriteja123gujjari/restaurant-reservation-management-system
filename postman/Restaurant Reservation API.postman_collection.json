@@ -1,0 +1,98 @@
+{
+  "info": {
+    "_postman_id": "cb6baCe4CDF1d40Fd43a1B9d",
+    "name": "Restaurant Reservation API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}",
+            "disabled": false
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}",
+            "disabled": true,
+            "description": ""
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/admin/reservations",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "admin", "reservations"]
+        }
+      },
+      "auth": {
+        "type": "bearer"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "",
+              "pm.collectionVariables.set(\"adminToken\", data.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customerToken}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"customer2@demo.com\",\r\n  \"password\": \"test1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/ogin",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "auth", "ogin"]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const data = pm.response.json();",
+              "",
+              "pm.collectionVariables.set(\"customer2Token\", data.token);"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "variable": []
+}
