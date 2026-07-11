@@ -1,6 +1,7 @@
 This project is a full-stack solution built for the **Vibe Coding Intern** assignment. It manages restaurant table bookings with a strong focus on data integrity, role-based security, and preventing the "double-booking" problem at the database level.
 
-**Live Application:** [[Insert Your Vercel/Netlify URL Here](https://restaurant-reservation-management-s-eta.vercel.app/)]**Backend API:** [[Insert Your Render/Railway URL Here](https://restaurant-reservation-management-system-j087.onrender.com)]
+Live Application: https://restaurant-reservation-management-s-eta.vercel.app/
+Backend API: https://restaurant-reservation-management-system-j087.onrender.com
 
 ---
 
