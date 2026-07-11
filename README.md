@@ -48,7 +48,7 @@ To ensure the reliability of the system, I've thoroughly tested the core API end
 
 *Full Postman collection is available in the **`/postman`** directory.*
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Frontend:** React.js (State management, role-specific routing)
 
@@ -122,4 +122,4 @@ The system distinguishes between **Customers** and **Administrators**:
 
 ##  Author
 
-**Sriteja**Full-Stack Developer Intern Applicant
+**Sriteja**
