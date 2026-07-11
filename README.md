@@ -1,125 +1,192 @@
+# Restaurant Reservation Management System
+
 This project is a full-stack solution built for the **Vibe Coding Intern** assignment. It manages restaurant table bookings with a strong focus on data integrity, role-based security, and preventing the "double-booking" problem at the database level.
 
-Live Application: https://restaurant-reservation-management-s-eta.vercel.app/
-Backend API: https://restaurant-reservation-management-system-j087.onrender.com
+**Live Application:** https://restaurant-reservation-management-s-eta.vercel.app/
+
+**Backend API:** https://restaurant-reservation-management-system-j087.onrender.com
+
+> **Note:** The backend is deployed on Render's free tier. The first request after a period of inactivity may take **30–50 seconds** while the server wakes up.
 
 ---
 
 ## Quick Start
 
-### Backend Setup
+## Backend Setup
 
-1. `cd backend`
+```bash
+cd backend
+npm install
+```
 
-1. `npm install`
+Create a `.env` file:
 
-1. Create a `.env` file with your `MONGO_URI` and `JWT_SECRET`.
+```env
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
 
-1. `npm run seed` (This seeds 6 tables with varying capacities and creates demo accounts).
+Seed the database:
 
-1. `npm start` (or `npm run dev` for development).
+```bash
+npm run seed
+```
 
-### Frontend Setup
+Start the server:
 
-1. `cd frontend`
+```bash
+npm start
+# or
+npm run dev
+```
 
-1. `npm install`
+## Frontend Setup
 
-1. `npm run dev`
+```bash
+cd frontend
+npm install
+```
 
-**Demo Credentials:**
+Create `.env`
 
-- **Admin:** `admin@demo.com` / `admin123`
+```env
+VITE_API_URL=http://localhost:5000
+```
 
-- **Customer:** `customer@demo.com` / `customer123`
+Run the frontend
+
+```bash
+npm run dev
+```
+
+## Demo Credentials
+
+**Admin**
+
+```
+Email: admin@demo.com
+Password: admin123
+```
+
+**Customer**
+
+```
+Email: customer@demo.com
+Password: customer123
+```
 
 ---
 
-## API Testing Evidence
+# API Testing Evidence
 
-To ensure the reliability of the system, I've thoroughly tested the core API endpoints using Postman. Below are some key test cases:
+The API was manually tested using **Postman**. Below are representative test cases demonstrating validation, authorization, conflict detection, and successful operations.
 
 | Test Case | Description | Screenshot |
-| --- | --- | --- |
-| **Successful Booking** | Creating a reservation for an available table and slot. | ![Successful Booking](./screenshots/Screenshot%202026-07-11%20172446.png) |
-| **Double-Booking Rejection** | Attempting to book a table that is already reserved (409 Conflict). | ![Conflict Rejection](./screenshots/Screenshot%202026-07-11%20172446.png) |
-| **Capacity Validation** | Rejection when guests exceed table capacity (400 Bad Request). | ![Capacity Rejection](./screenshots/Screenshot%202026-07-11%20210744.png) |
-| **Admin Dashboard** | Viewing all reservations as an administrator. | ![Admin View](./screenshots/Screenshot%202026-07-11%20210524.png) |
+|------------|-------------|------------|
+| **Successful Request** | Reservation/API request completed successfully (**200 OK**). | ![Success](./screenshots/Screenshot%202026-07-11%20210524.png) |
+| **Input Validation** | Invalid request data rejected (**400 Bad Request**). | ![400](./screenshots/Screenshot%202026-07-11%20205738.png) |
+| **Reservation Conflict** | Attempt to reserve an already-booked table/time slot rejected (**409 Conflict**). | ![409](./screenshots/Screenshot%202026-07-11%20172446.png) |
+| **Role-Based Access Control** | Customer attempted to access an administrator-only endpoint (**403 Forbidden**). | ![403](./screenshots/Screenshot%202026-07-11%20210744.png) |
+| **Additional Authorization Test** | Another admin-protected endpoint tested with insufficient permissions (**403 Forbidden**). | ![403](./screenshots/Screenshot%202026-07-11%20212311.png) |
 
-*Full Postman collection is available in the **`/postman`** directory.*
+**Postman Collection**
 
-## Tech Stack
-
-- **Frontend:** React.js (State management, role-specific routing)
-
-- **Backend:** Node.js & Express (RESTful API design)
-
-- **Database:** MongoDB & Mongoose (Schema design & indexing)
-
-- **Auth:** JSON Web Tokens (JWT) & bcryptjs
+The complete Postman collection is included inside the **`/postman`** folder and can be imported directly into Postman.
 
 ---
 
-## Technical Deep Dive: The "Double-Booking" Solution
+# Tech Stack
 
-One of the biggest challenges in a reservation system is ensuring two people don't book the same table at the same time. Many developers try to solve this with a "check then insert" logic in the code, but that fails during high traffic due to race conditions.
+### Frontend
 
-I solved this by pushing the validation down to **MongoDB**. I implemented a **Unique Compound Index** with a partial filter:
+- React.js
+- React Router
+- Axios
+
+### Backend
+
+- Node.js
+- Express.js
+
+### Database
+
+- MongoDB
+- Mongoose
+
+### Authentication
+
+- JWT (JSON Web Tokens)
+- bcryptjs
+
+---
+
+# Technical Deep Dive: Preventing Double Booking
+
+A reservation system must guarantee that two customers cannot reserve the same table for the same date and time slot.
+
+Instead of relying solely on application logic ("check then insert"), I enforced this rule directly in MongoDB using a **Unique Compound Index**.
 
 ```javascript
 reservationSchema.index(
   { table: 1, date: 1, timeSlot: 1 },
-  { 
-    unique: true, 
-    partialFilterExpression: { status: 'confirmed' } 
+  {
+    unique: true,
+    partialFilterExpression: {
+      status: "confirmed",
+    },
   }
 );
 ```
 
-**Why this works:**
+## Why this approach?
 
-- It ensures that for any given `table`, `date`, and `timeSlot`, there can only be one `confirmed` reservation.
-
-- If two requests hit the server at the exact same millisecond, the database will reject the second one with a `11000` error.
-
-- The API catches this error and returns a clean `409 Conflict` message to the user.
-
-- Because it's a *partial* index, once a reservation is marked as `cancelled`, the slot is immediately freed up for others.
+- Guarantees only one confirmed reservation per table, date and slot.
+- Eliminates race conditions during concurrent requests.
+- MongoDB rejects duplicate inserts with error **11000**.
+- The API converts this into a **409 Conflict** response.
+- Cancelled reservations automatically free the slot because of the partial index.
 
 ---
 
-## Role-Based Access Control (RBAC)
+# Role-Based Access Control (RBAC)
 
-The system distinguishes between **Customers** and **Administrators**:
+## Customer
 
-- **Customers:** Can view available tables, create their own bookings, and cancel them. I've added an ownership check on the backend so a customer can't cancel someone else's booking even if they know the ID.
+- View available tables
+- Create reservations
+- Cancel only their own reservations
 
-- **Administrators:** Have a dedicated dashboard to see all bookings across all dates. They can cancel or update any reservation and manage the restaurant's table configuration.
+Ownership validation is enforced on the backend.
 
----
+## Administrator
 
-## Assumptions Made
-
-- **Fixed Time Slots:** To keep the user experience predictable and avoid complex "overlapping time" math, I used four fixed 90-minute slots.
-
-- **Single Restaurant:** The current version assumes a single-location setup.
-
-- **Capacity Enforcement:** A booking is only allowed if the table's seating capacity is greater than or equal to the guest count.
-
----
-
-## Known Limitations & Future Improvements
-
-- **Real-time Updates:** Currently, users need to refresh to see if a slot was just taken. Adding WebSockets (Socket.io) would make the table map live.
-
-- **Email Notifications:** I'd love to integrate SendGrid or Twilio to send automated confirmation codes and reminders.
-
-- **Pagination:** For a real restaurant with thousands of bookings, the admin view would need server-side pagination to stay fast.
-
-- **Testing:** I've manually tested the API via Postman (collection included), but adding automated Jest integration tests for the conflict logic is the next logical step.
+- View every reservation
+- Filter reservations
+- Update reservations
+- Cancel any reservation
 
 ---
 
-##  Author
+# Assumptions
+
+- Four fixed reservation time slots.
+- Single restaurant location.
+- Six predefined tables.
+- Table capacity must be greater than or equal to guest count.
+- Admin accounts are created for demonstration purposes.
+
+---
+
+# Known Limitations & Future Improvements
+
+- Real-time availability using Socket.io.
+- Email confirmations and reminders.
+- Server-side pagination.
+- Admin table management UI.
+- Automated integration tests using Jest.
+
+---
+
+# Author
 
 **Sriteja**
