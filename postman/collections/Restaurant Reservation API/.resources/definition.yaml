@@ -1,0 +1,7 @@
+$kind: collection
+name: Restaurant Reservation API
+variables:
+  baseUrl: ""
+  customerToken: ""
+  adminToken: ""
+  customer2Token: ""

@@ -1,5 +1,6 @@
 const express = require('express');
 const Table = require('../models/Table');
+const { getAvailability } = require('../controllers/reservationController');
 
 const router = express.Router();
 
@@ -12,5 +13,8 @@ router.get('/', async (req, res, next) => {
     next(err);
   }
 });
+
+// GET /api/tables/availability?date=&timeSlot= - which tables are free
+router.get('/availability', getAvailability);
 
 module.exports = router;

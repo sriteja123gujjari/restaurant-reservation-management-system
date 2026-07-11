@@ -6,6 +6,8 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/authRoutes');
 const tableRoutes = require('./routes/tableRoutes');
+const reservationRoutes = require('./routes/reservationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 connectDB();
 
@@ -21,9 +23,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tables', tableRoutes);
-
-// TODO (tomorrow): app.use('/api/reservations', reservationRoutes);
-// TODO (tomorrow): app.use('/api/admin', adminRoutes);
+app.use('/api/reservations', reservationRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

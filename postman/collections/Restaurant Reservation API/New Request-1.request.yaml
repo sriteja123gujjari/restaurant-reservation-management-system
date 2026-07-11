@@ -1,0 +1,28 @@
+$kind: http-request
+name: New Request
+description: ""
+url: "{{baseUrl}}/api/auth/ogin"
+method: POST
+headers:
+  Authorization: Bearer {{customerToken}}
+body:
+  type: json
+  content: "{\r
+
+    \  \"email\": \"customer2@demo.com\",\r
+
+    \  \"password\": \"test1234\"\r
+
+    }"
+scripts:
+  - type: afterResponse
+    code: "const data = pm.response.json();\r
+
+      pm.collectionVariables.set(\"customer2Token\", data.token);"
+    language: text/javascript
+settings:
+  strictSSL: false
+  followRedirects: true
+  disableCookies: false
+  maxResponseSize: 52428800
+order: 1627807110068521
