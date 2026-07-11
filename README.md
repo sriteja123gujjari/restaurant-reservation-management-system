@@ -41,8 +41,8 @@ To ensure the reliability of the system, I've thoroughly tested the core API end
 | Test Case | Description | Screenshot |
 | --- | --- | --- |
 | **Successful Booking** | Creating a reservation for an available table and slot. | ![Successful Booking](./screenshots/Screenshot%202026-07-11%20172446.png) |
-| **Double-Booking Rejection** | Attempting to book a table that is already reserved (409 Conflict). | ![Conflict Rejection](./screenshots/Screenshot%2026-07-11%172446.png) |
-| **Capacity Validation** | Rejection when guests exceed table capacity (400 Bad Request). | ![Capacity Rejection](./screenshots/Screenshot%202026-07-11%20205525.png) |
+| **Double-Booking Rejection** | Attempting to book a table that is already reserved (409 Conflict). | ![Conflict Rejection](./screenshots/Screenshot%202026-07-11%172446.png) |
+| **Capacity Validation** | Rejection when guests exceed table capacity (400 Bad Request). | ![Capacity Rejection](./screenshots/Screenshot%202026-07-11%210744.png) |
 | **Admin Dashboard** | Viewing all reservations as an administrator. | ![Admin View](./screenshots/Screenshot%202026-07-11%20210524.png) |
 
 *Full Postman collection is available in the **`/postman`** directory.*
