@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #17262B;
+  color: #EDE7D9;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+/* Custom premium scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #17262B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2C444C;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A227;
+}
+
+/* Visible keyboard focus everywhere - accessibility floor */
+:focus-visible {
+  outline: 2px solid #C9A227;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Entry animations for dashboard elements */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideup {
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Signature element: a perforated ticket-stub edge, like a torn reservation slip */
+.ticket-edge {
+  position: relative;
+}
+
+.ticket-edge::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: radial-gradient(circle, #17262B 2px, transparent 2.5px);
+  background-size: 14px 1px;
+  background-repeat: repeat-x;
+}
+
+/* Ticket tear effect helper */
+.ticket-edge-bottom {
+  position: relative;
+}
+
+.ticket-edge-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-image: radial-gradient(circle, #17262B 2px, transparent 2.5px);
+  background-size: 14px 1px;
+  background-repeat: repeat-x;
+}
+
+.stamp {
+  transform: rotate(-8deg);
+}
