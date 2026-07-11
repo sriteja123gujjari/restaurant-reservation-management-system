@@ -34,7 +34,7 @@ This project is a full-stack solution built for the **Vibe Coding Intern** assig
 
 ---
 
-## 📸 API Testing Evidence
+## API Testing Evidence
 
 To ensure the reliability of the system, I've thoroughly tested the core API endpoints using Postman. Below are some key test cases:
 
@@ -59,7 +59,7 @@ To ensure the reliability of the system, I've thoroughly tested the core API end
 
 ---
 
-## 🧠 Technical Deep Dive: The "Double-Booking" Solution
+## Technical Deep Dive: The "Double-Booking" Solution
 
 One of the biggest challenges in a reservation system is ensuring two people don't book the same table at the same time. Many developers try to solve this with a "check then insert" logic in the code, but that fails during high traffic due to race conditions.
 
@@ -121,4 +121,4 @@ The system distinguishes between **Customers** and **Administrators**:
 
 ##  Author
 
-**[Sriteja]**Full-Stack Developer Intern Applicant
+**Sriteja**Full-Stack Developer Intern Applicant
