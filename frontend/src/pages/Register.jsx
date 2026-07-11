@@ -45,38 +45,38 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-text-muted">Full name</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Full name</span>
             <input
               type="text"
               required
               value={form.name}
               onChange={update('name')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text outline-none transition-colors focus:border-gold"
+              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
               placeholder="Jane Doe"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-text-muted">Email</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Email Address</span>
             <input
               type="email"
               required
               value={form.email}
               onChange={update('email')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text outline-none transition-colors focus:border-gold"
+              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
               placeholder="you@example.com"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-text-muted">Password</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Password</span>
             <input
               type="password"
               required
               minLength={6}
               value={form.password}
               onChange={update('password')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text outline-none transition-colors focus:border-gold"
+              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
               placeholder="At least 6 characters"
             />
           </label>

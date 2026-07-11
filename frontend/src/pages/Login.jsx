@@ -58,25 +58,25 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-text-muted">Email</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Email Address</span>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text outline-none transition-colors focus:border-gold"
+              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
               placeholder="you@example.com"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-text-muted">Password</span>
+            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Password</span>
             <input
               type="password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text outline-none transition-colors focus:border-gold"
+              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
               placeholder="••••••••"
             />
           </label>
@@ -104,18 +104,30 @@ export default function Login() {
           </p>
           <div className="flex flex-col gap-2">
             <button
+              type="button"
               onClick={() => handleQuickLogin('customer@demo.com', 'customer123')}
-              className="flex items-center justify-between rounded-sm border border-ink-lighter bg-ink-light/50 px-4 py-2.5 text-xs text-text hover:border-gold/50 hover:bg-ink-light transition-all"
+              className="flex flex-col gap-1 rounded-sm border border-ink-lighter bg-ink-light/30 px-4 py-2.5 text-left hover:border-gold/50 hover:bg-ink-light/60 transition-all duration-300"
             >
-              <span>Customer Demo</span>
-              <span className="font-mono text-[9px] uppercase tracking-wide text-gold">One-Click Log In</span>
+              <div className="flex justify-between items-center w-full">
+                <span className="text-xs font-bold text-text">Customer Demo</span>
+                <span className="font-mono text-[9px] uppercase tracking-wide text-gold">One-Click Log In</span>
+              </div>
+              <div className="text-[10px] text-text-muted/80 font-mono">
+                customer@demo.com / customer123
+              </div>
             </button>
             <button
+              type="button"
               onClick={() => handleQuickLogin('admin@demo.com', 'admin123')}
-              className="flex items-center justify-between rounded-sm border border-ink-lighter bg-ink-light/50 px-4 py-2.5 text-xs text-text hover:border-gold/50 hover:bg-ink-light transition-all"
+              className="flex flex-col gap-1 rounded-sm border border-ink-lighter bg-ink-light/30 px-4 py-2.5 text-left hover:border-gold/50 hover:bg-ink-light/60 transition-all duration-300"
             >
-              <span>Admin Demo</span>
-              <span className="font-mono text-[9px] uppercase tracking-wide text-gold">One-Click Log In</span>
+              <div className="flex justify-between items-center w-full">
+                <span className="text-xs font-bold text-text">Admin Demo</span>
+                <span className="font-mono text-[9px] uppercase tracking-wide text-gold">One-Click Log In</span>
+              </div>
+              <div className="text-[10px] text-text-muted/80 font-mono">
+                admin@demo.com / admin123
+              </div>
             </button>
           </div>
         </div>
