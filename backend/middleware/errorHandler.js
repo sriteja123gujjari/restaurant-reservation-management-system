@@ -1,13 +1,19 @@
-// Catches requests to routes that don't exist
+const { ZodError } = require('zod');
+
 const notFound = (req, res, next) => {
   res.status(404);
   next(new Error(`Route not found: ${req.originalUrl}`));
 };
 
-// Central place all errors flow through, instead of scattering
-// try/catch response logic across every controller.
-// Any controller can just call next(err) and it lands here.
 const errorHandler = (err, req, res, next) => {
+  // Zod validation failure — flatten to a readable message list
+  if (err instanceof ZodError) {
+    const errors = err.issues ?? err.errors;
+    return res.status(400).json({
+      message: errors.map((e) => `${e.path.join('.') || e.path[0]}: ${e.message}`).join(', '),
+    });
+  }
+
   // MongoDB duplicate key error (used by the reservation unique index)
   if (err.code === 11000) {
     return res.status(409).json({
