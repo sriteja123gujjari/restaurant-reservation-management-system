@@ -104,7 +104,7 @@ Restricted CORS to my frontend URL using the ALLOWED_ORIGIN environment variable
 
 # Where the AI was wrong or I had to fix it
 
-The AI's first implementation of the Zod validation response was not formatted as clean JSON; two files were empty and you had to find them with cat. Add one sentence about it..
+The AI gave me multiple files in one response. When I ran the server, validate.js was empty — I only found this by running cat middleware/validate.js which returned nothing. I had to manually paste the content into the file. This taught me to verify each file with cat after creating it rather than assuming the content was saved.
 
 ## What I actually changed / verified
 
