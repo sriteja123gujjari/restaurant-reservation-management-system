@@ -1,5 +1,50 @@
 $kind: http-request
 name: New Request
-url: ""
-method: GET
+url: https://teja1gujjari.app.n8n.cloud/webhook-test/whatsapp-support
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{\r
+
+    \  \"entry\": [\r
+
+    \    {\r
+
+    \      \"changes\": [\r
+
+    \        {\r
+
+    \          \"value\": {\r
+
+    \            \"messages\": [\r
+
+    \              {\r
+
+    \                \"from\": \"919812345678\",\r
+
+    \                \"id\": \"wamid.ORDER123\",\r
+
+    \                \"text\": {\r
+
+    \                  \"body\": \"How are you?\"\r
+
+    \                }\r
+
+    \              }\r
+
+    \            ]\r
+
+    \          }\r
+
+    \        }\r
+
+    \      ]\r
+
+    \    }\r
+
+    \  ]\r
+
+    }"
 order: 4347607442064190

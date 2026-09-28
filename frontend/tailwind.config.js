@@ -5,27 +5,27 @@ export default {
     extend: {
       colors: {
         ink: {
-          DEFAULT: '#17262B',
-          light: '#22383F',
-          lighter: '#2C444C',
+          DEFAULT: '#111827',
+          light: '#FFFFFF',
+          lighter: '#F3F4F6',
         },
         gold: {
-          DEFAULT: '#C9A227',
-          soft: '#E4C766',
-          dim: '#8A701C',
+          DEFAULT: '#B45309',
+          soft: '#D97706',
+          dim: '#92400E',
         },
         sage: {
-          DEFAULT: '#7FA089',
-          dim: '#5C7A66',
+          DEFAULT: '#059669',
+          dim: '#047857',
         },
         brick: {
-          DEFAULT: '#C1443D',
-          dim: '#8E322C',
+          DEFAULT: '#DC2626',
+          dim: '#B91C1C',
         },
-        paper: '#F3EEDF',
+        paper: '#FFFFFF',
         text: {
-          DEFAULT: '#EDE7D9',
-          muted: '#9FB0AF',
+          DEFAULT: '#111827',
+          muted: '#6B7280',
         },
       },
       fontFamily: {

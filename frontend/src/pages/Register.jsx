@@ -28,55 +28,55 @@ export default function Register() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[85vh] max-w-md flex-col justify-center px-6 py-12 animate-slideup">
-      <div className="rounded-sm border border-gold/20 bg-ink-light/40 p-8 shadow-xl backdrop-blur-sm">
-        <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">
-          Create account
-        </p>
-        <h1 className="mb-6 font-sans text-2xl md:text-3xl font-bold uppercase tracking-tight text-text">
-          Reserve <span className="text-gold">your table</span>
+    <div className="mx-auto flex min-h-[85vh] max-w-sm flex-col justify-center px-6 py-12 animate-slideup">
+      <div>
+        <h1 className="mb-1 font-sans text-2xl font-bold text-gray-900">
+          Create an account
         </h1>
+        <p className="mb-8 text-sm text-gray-500">
+          Get started with your first reservation
+        </p>
 
         {error && (
-          <div className="mb-6 rounded-sm border border-brick bg-brick/10 px-4 py-3 text-xs text-brick">
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 font-medium">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Full name</span>
+            <span className="text-sm font-medium text-gray-700">Full name</span>
             <input
               type="text"
               required
               value={form.name}
               onChange={update('name')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
+              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30"
               placeholder="Jane Doe"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Email Address</span>
+            <span className="text-sm font-medium text-gray-700">Email</span>
             <input
               type="email"
               required
               value={form.email}
               onChange={update('email')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
+              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30"
               placeholder="you@example.com"
             />
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-xs uppercase tracking-wide text-gold-soft">Password</span>
+            <span className="text-sm font-medium text-gray-700">Password</span>
             <input
               type="password"
               required
               minLength={6}
               value={form.password}
               onChange={update('password')}
-              className="rounded-sm border border-ink-lighter bg-ink px-4 py-2.5 text-sm text-text placeholder:text-text-muted/60 outline-none transition-colors focus:border-gold"
+              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30"
               placeholder="At least 6 characters"
             />
           </label>
@@ -84,16 +84,16 @@ export default function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-sm bg-gold px-4 py-3 text-xs font-bold uppercase tracking-wider text-ink transition-all duration-300 hover:bg-gold-soft disabled:opacity-50"
+            className="mt-1 rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-white hover:bg-gold-soft disabled:opacity-50 transition-colors"
           >
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-text-muted">
+        <p className="mt-6 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <Link to="/login" className="text-gold hover:text-gold-soft hover:underline">
-            Sign in here
+          <Link to="/login" className="text-gold font-medium hover:underline">
+            Sign in
           </Link>
         </p>
       </div>

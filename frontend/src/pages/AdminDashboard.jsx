@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   };
 
   const cancelReservation = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this booking as Admin?')) return;
+    if (!window.confirm('Cancel this booking?')) return;
     try {
       await api.updateReservation(id, { status: 'cancelled' }, token);
       load();
@@ -55,234 +55,173 @@ export default function AdminDashboard() {
     }
   };
 
-  // Compute stats metrics dynamically
+  const confirmReservation = async (id) => {
+    try {
+      await api.updateReservation(id, { status: 'confirmed' }, token);
+      load();
+    } catch (err) {
+      const text =
+        err.status === 409
+          ? 'Cannot confirm: This table is already booked for this date and time slot.'
+          : err.message;
+      setError(text);
+    }
+  };
+
   const confirmedList = reservations.filter((r) => r.status === 'confirmed');
-  const totalBookings = reservations.length;
-  const activeBookings = confirmedList.length;
+  const pendingList = reservations.filter((r) => r.status === 'pending');
+  const cancelledList = reservations.filter((r) => r.status === 'cancelled');
   const totalCovers = confirmedList.reduce((acc, r) => acc + (r.guests || 0), 0);
-  
-  // Calculate unique tables occupied
-  const uniqueTablesOccupied = new Set(confirmedList.map((r) => r.table?.tableNumber)).size;
+
+  const stats = [
+    { label: 'Total Bookings', value: reservations.length, color: 'text-gray-900' },
+    { label: 'Confirmed', value: confirmedList.length, color: 'text-emerald-600' },
+    { label: 'Pending', value: pendingList.length, color: 'text-amber-600' },
+    { label: 'Cancelled', value: cancelledList.length, color: 'text-red-500' },
+  ];
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12 animate-slideup">
-      <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.25em] text-gold">Management</p>
-      <h1 className="mb-8 font-sans text-3xl md:text-4xl font-bold uppercase tracking-tight text-text">
-        The Reservation <span className="text-gold">Ledger</span>
-      </h1>
+    <div className="mx-auto max-w-6xl px-6 py-10 animate-slideup">
+      <h1 className="mb-1 text-2xl font-bold text-gray-900">Reservations Dashboard</h1>
+      <p className="mb-8 text-sm text-gray-500">Manage all bookings, update status, and track guest covers</p>
 
-      {/* Metrics Cards Grid (UX upgrade: gives admin instant context) */}
+      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div className="rounded-sm border border-ink-lighter bg-ink-light/20 p-5 backdrop-blur-sm">
-          <span className="block font-mono text-[9px] uppercase tracking-wider text-text-muted">
-            Total Bookings Listed
-          </span>
-          <span className="text-3xl font-sans font-bold text-text mt-1 block">
-            {totalBookings}
-          </span>
-        </div>
-        <div className="rounded-sm border border-ink-lighter bg-ink-light/20 p-5 backdrop-blur-sm">
-          <span className="block font-mono text-[9px] uppercase tracking-wider text-text-muted">
-            Active Confirmed
-          </span>
-          <span className="text-3xl font-sans font-bold text-sage mt-1 block">
-            {activeBookings}
-          </span>
-        </div>
-        <div className="rounded-sm border border-ink-lighter bg-ink-light/20 p-5 backdrop-blur-sm">
-          <span className="block font-mono text-[9px] uppercase tracking-wider text-text-muted">
-            Total Guest Covers
-          </span>
-          <span className="text-3xl font-sans font-bold text-gold mt-1 block">
-            {totalCovers}
-          </span>
-        </div>
-        <div className="rounded-sm border border-ink-lighter bg-ink-light/20 p-5 backdrop-blur-sm">
-          <span className="block font-mono text-[9px] uppercase tracking-wider text-text-muted">
-            Unique Tables Used
-          </span>
-          <span className="text-3xl font-sans font-bold text-text mt-1 block">
-            {uniqueTablesOccupied} <span className="text-xs text-text-muted">/ 6</span>
-          </span>
-        </div>
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+            <span className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{s.label}</span>
+            <span className={`text-2xl font-bold ${s.color}`}>{s.value}</span>
+          </div>
+        ))}
       </div>
 
-      {/* Filter and control layout */}
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-ink-lighter pb-5">
-        <div className="flex flex-wrap items-end gap-4">
-          <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted">Filter by date</span>
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="rounded-sm border border-ink-lighter bg-ink-light px-3 py-2 text-xs text-text outline-none focus:border-gold transition-colors"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted">Status</span>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-sm border border-ink-lighter bg-ink-light px-3 py-2 text-xs text-text outline-none focus:border-gold transition-colors"
-            >
-              <option value="">All Statuses</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </label>
-
-          {(dateFilter || statusFilter) && (
-            <button
-              onClick={() => {
-                setDateFilter('');
-                setStatusFilter('');
-              }}
-              className="font-mono text-[10px] uppercase tracking-wider text-gold hover:text-gold-soft mb-2"
-            >
-              Clear filters
-            </button>
-          )}
+      {/* Filters */}
+      <div className="flex flex-wrap items-end gap-3 mb-6">
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</span>
+          <input
+            type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gold focus:ring-1 focus:ring-gold/30"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5">
+          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</span>
+          <select
+            value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+            className="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gold focus:ring-1 focus:ring-gold/30"
+          >
+            <option value="">All</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="pending">Pending</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </label>
+        {(dateFilter || statusFilter) && (
+          <button onClick={() => { setDateFilter(''); setStatusFilter(''); }}
+            className="text-xs font-medium text-gold hover:underline mb-0.5">
+            Clear filters
+          </button>
+        )}
+        <div className="ml-auto">
+          <button onClick={load}
+            className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            Refresh
+          </button>
         </div>
-
-        <button 
-          onClick={load}
-          className="rounded-sm border border-gold/30 hover:border-gold px-4 py-2 text-xs font-semibold uppercase tracking-wider text-text hover:bg-gold/5 transition-all"
-        >
-          Refresh Ledger
-        </button>
       </div>
 
       {error && (
-        <div className="mb-5 rounded-sm border border-brick bg-brick/10 px-4 py-3 text-sm text-brick">
+        <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 font-medium">
           {error}
         </div>
       )}
 
-      {/* Modern Ledger Table */}
-      <div className="overflow-x-auto rounded-sm border border-ink-lighter bg-ink-light/10 shadow-lg">
+      {/* Table */}
+      <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white shadow-sm">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-ink-lighter bg-ink-light/50 font-mono text-[10px] uppercase tracking-wider text-text-muted">
-              <th className="px-5 py-4 text-left">Guest Detail</th>
-              <th className="px-5 py-4 text-left">Seating Allocation</th>
-              <th className="px-5 py-4 text-left">Date</th>
-              <th className="px-5 py-4 text-left">Time Slot</th>
-              <th className="px-5 py-4 text-left">Party Size</th>
-              <th className="px-5 py-4 text-left">Status</th>
-              <th className="px-5 py-4 text-right">Actions</th>
+            <tr className="border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <th className="px-5 py-3.5 text-left">Guest</th>
+              <th className="px-5 py-3.5 text-left">Table</th>
+              <th className="px-5 py-3.5 text-left">Date</th>
+              <th className="px-5 py-3.5 text-left">Time</th>
+              <th className="px-5 py-3.5 text-left">Guests</th>
+              <th className="px-5 py-3.5 text-left">Status</th>
+              <th className="px-5 py-3.5 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {reservations.map((r, i) => {
+            {reservations.map((r) => {
               const isEditing = editingId === r._id;
+
+              const statusBadge = {
+                confirmed: 'bg-green-50 text-green-700 border-green-200',
+                pending: 'bg-amber-50 text-amber-700 border-amber-200',
+                cancelled: 'bg-gray-50 text-gray-500 border-gray-200',
+              }[r.status] || 'bg-gray-50 text-gray-500 border-gray-200';
+
               return (
-                <tr
-                  key={r._id}
-                  className={`border-b border-ink-lighter/30 transition-colors hover:bg-ink-light/20 ${
-                    i % 2 === 0 ? 'bg-transparent' : 'bg-ink-light/5'
-                  }`}
-                >
+                <tr key={r._id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                   {isEditing ? (
                     <>
                       <td className="px-5 py-3">
-                        <div className="font-semibold text-text">{r.user?.name}</div>
-                        <div className="text-xs text-text-muted">{r.user?.email}</div>
+                        <div className="font-semibold text-gray-900">{r.user?.name}</div>
+                        <div className="text-xs text-gray-400">{r.user?.email}</div>
                       </td>
-                      <td className="px-5 py-3 font-mono">Table #{r.table?.tableNumber}</td>
+                      <td className="px-5 py-3 text-gray-700 font-medium">T{r.table?.tableNumber}</td>
                       <td className="px-5 py-3">
-                        <input
-                          type="date"
-                          value={editForm.date}
+                        <input type="date" value={editForm.date}
                           onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                          className="rounded-sm border border-ink-lighter bg-ink px-3 py-1.5 text-xs text-text outline-none focus:border-gold"
-                        />
+                          className="rounded-md border border-gray-200 px-2 py-1.5 text-xs outline-none focus:border-gold" />
                       </td>
                       <td className="px-5 py-3">
-                        <select
-                          value={editForm.timeSlot}
+                        <select value={editForm.timeSlot}
                           onChange={(e) => setEditForm({ ...editForm, timeSlot: e.target.value })}
-                          className="rounded-sm border border-ink-lighter bg-ink px-3 py-1.5 text-xs text-text outline-none focus:border-gold"
-                        >
-                          {TIME_SLOTS.map((slot) => (
-                            <option key={slot} value={slot}>
-                              {slot}
-                            </option>
-                          ))}
+                          className="rounded-md border border-gray-200 px-2 py-1.5 text-xs outline-none focus:border-gold">
+                          {TIME_SLOTS.map((s) => <option key={s} value={s}>{s}</option>)}
                         </select>
                       </td>
                       <td className="px-5 py-3">
-                        <input
-                          type="number"
-                          min={1}
-                          max={12}
-                          value={editForm.guests}
+                        <input type="number" min={1} max={12} value={editForm.guests}
                           onChange={(e) => setEditForm({ ...editForm, guests: e.target.value })}
-                          className="w-16 rounded-sm border border-ink-lighter bg-ink px-3 py-1.5 text-xs text-text outline-none focus:border-gold"
-                        />
+                          className="w-14 rounded-md border border-gray-200 px-2 py-1.5 text-xs outline-none focus:border-gold" />
                       </td>
                       <td className="px-5 py-3">
-                        <span className="font-mono text-xs uppercase text-sage">{r.status}</span>
+                        <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase ${statusBadge}`}>{r.status}</span>
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <button
-                          onClick={() => saveEdit(r._id)}
-                          className="mr-3 font-mono text-xs uppercase font-bold text-sage hover:underline"
-                        >
-                          Save
-                        </button>
-                        <button
-                          onClick={() => setEditingId(null)}
-                          className="font-mono text-xs uppercase font-bold text-text-muted hover:underline"
-                        >
-                          Cancel
-                        </button>
+                      <td className="px-5 py-3 text-right space-x-2">
+                        <button onClick={() => saveEdit(r._id)} className="text-xs font-medium text-emerald-600 hover:underline">Save</button>
+                        <button onClick={() => setEditingId(null)} className="text-xs font-medium text-gray-400 hover:underline">Cancel</button>
                       </td>
                     </>
                   ) : (
                     <>
-                      <td className="px-5 py-4">
-                        <div className="font-semibold text-text">{r.user?.name}</div>
-                        <div className="text-xs text-text-muted font-mono">{r.user?.email}</div>
+                      <td className="px-5 py-3.5">
+                        <div className="font-semibold text-gray-900">{r.user?.name}</div>
+                        <div className="text-xs text-gray-400">{r.user?.email}</div>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="font-mono font-semibold text-text">
-                          Table #{r.table?.tableNumber || '#'}
-                        </span>
-                        <span className="text-[10px] text-text-muted block font-mono">
-                          Capacity: {r.table?.capacity || 2} persons
-                        </span>
+                      <td className="px-5 py-3.5 text-gray-700 font-medium">
+                        T{r.table?.tableNumber || '#'}
+                        <span className="block text-[10px] text-gray-400">{r.table?.capacity} seats</span>
                       </td>
-                      <td className="px-5 py-4 font-mono text-xs text-text-muted">{r.date}</td>
-                      <td className="px-5 py-4 font-mono text-xs text-text-muted">{r.timeSlot}</td>
-                      <td className="px-5 py-4 font-semibold text-text">{r.guests} guests</td>
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-block rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider ${
-                            r.status === 'confirmed'
-                              ? 'bg-sage/10 text-sage border border-sage/20'
-                              : 'bg-ink-light/50 text-text-muted border border-ink-lighter'
-                          }`}
-                        >
+                      <td className="px-5 py-3.5 text-gray-600">{r.date}</td>
+                      <td className="px-5 py-3.5 text-gray-600">{r.timeSlot}</td>
+                      <td className="px-5 py-3.5 font-medium text-gray-900">{r.guests}</td>
+                      <td className="px-5 py-3.5">
+                        <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${statusBadge}`}>
                           {r.status}
                         </span>
                       </td>
-                      <td className="px-5 py-4 text-right">
-                        {r.status === 'confirmed' && (
-                          <div className="flex justify-end gap-3.5">
-                            <button
-                              onClick={() => startEdit(r)}
-                              className="font-mono text-xs uppercase tracking-wider font-bold text-gold hover:text-gold-soft hover:underline transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => cancelReservation(r._id)}
-                              className="font-mono text-xs uppercase tracking-wider font-bold text-brick hover:text-brick-dim hover:underline transition-colors"
-                            >
-                              Cancel
-                            </button>
+                      <td className="px-5 py-3.5 text-right">
+                        {r.status !== 'cancelled' && (
+                          <div className="flex justify-end gap-3">
+                            {r.status === 'pending' && (
+                              <button onClick={() => confirmReservation(r._id)} className="text-xs font-semibold text-emerald-600 hover:underline">
+                                Confirm
+                              </button>
+                            )}
+                            <button onClick={() => startEdit(r)} className="text-xs font-medium text-gold hover:underline">Edit</button>
+                            <button onClick={() => cancelReservation(r._id)} className="text-xs font-medium text-brick hover:underline">Cancel</button>
                           </div>
                         )}
                       </td>
@@ -294,8 +233,12 @@ export default function AdminDashboard() {
 
             {reservations.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-5 py-12 text-center text-xs text-text-muted leading-relaxed">
-                  No bookings found matching filters.
+                <td colSpan={7} className="px-5 py-16 text-center">
+                  <svg className="h-8 w-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  <p className="text-sm font-medium text-gray-900 mb-0.5">No reservations found</p>
+                  <p className="text-xs text-gray-400">Try adjusting your filters</p>
                 </td>
               </tr>
             )}
