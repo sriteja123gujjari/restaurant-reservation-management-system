@@ -1,4 +1,5 @@
 require('dotenv').config();
+const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
@@ -19,6 +20,18 @@ app.use(express.json()); // lets req.body parse incoming JSON
 // Health check - useful to confirm the Render deployment is actually live
 app.get('/', (req, res) => {
   res.json({ status: 'ok', message: 'Reservation API is running' });
+});
+
+// Health check - reports server + DB status separately, for Render health
+// checks and for verifying DB connectivity without guessing from logs
+app.get('/health', (req, res) => {
+  const mongoStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),
+    mongo: mongoStates[mongoose.connection.readyState] || 'unknown',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use('/api/auth', authRoutes);
