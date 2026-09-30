@@ -125,3 +125,15 @@ The AI wrote the error formatter for Zod v3, but I had installed Zod v4 which wa
 ## Why rate limit only auth routes?
 
 Authentication endpoints are more likely to be targeted by brute-force or automated requests, so they need stricter limits. Reservation availability can involve several legitimate requests in a short period, so applying the same strict limit there could block genuine customers.
+
+
+## Phase 3 — Testing Suite (Jest, Supertest & Vitest)
+* **What I asked AI:** Set up backend integration tests using Jest/Supertest with `mongodb-memory-server` and frontend component testing with Vitest/React Testing Library.
+* **Where AI helped:**
+  * Separated Express app instance (`app.js`) from server listener (`server.js`) for clean HTTP testing.
+  * Solved timeout/lifecycle issues in `mongodb-memory-server` by increasing default hook timeouts (`jest.setTimeout(60000)`).
+  * Solved missing index enforcement during in-memory database execution by explicitly syncing schema indexes (`await Reservation.syncIndexes()`) to test HTTP 409 double-booking prevention.
+  * Resolved Vitest v5/Vite 5 peer dependency conflicts by pinning `vitest@^2.1.8` and wrapped tested React components in `<AuthProvider>` to provide context.
+* **Verification:**
+  * Backend: Executed `npm test` passing 5/5 integration test cases across `auth.test.js` and `reservation.test.js`.
+  * Frontend: Executed `npm test` passing unit assertions for `Navbar.jsx` with Vitest + JSDOM.

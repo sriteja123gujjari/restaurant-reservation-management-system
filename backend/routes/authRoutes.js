@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login } = require('../controllers/authController');
+const { register, login, refresh, logout } = require('../controllers/authController');
 const { authLimiter } = require('../middleware/rateLimiter');
 const validate = require('../middleware/validate');
 const { z } = require('zod');
@@ -18,7 +18,13 @@ const loginSchema = z.object({
     password: z.string().min(1, 'Password is required'),
 });
 
+const refreshSchema = z.object({
+    refreshToken: z.string().min(1, 'Refresh token is required'),
+});
+
 router.post('/register', authLimiter, validate(registerSchema), register);
 router.post('/login', authLimiter, validate(loginSchema), login);
+router.post('/refresh', validate(refreshSchema), refresh);
+router.post('/logout', logout);
 
 module.exports = router;

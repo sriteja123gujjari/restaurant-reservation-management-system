@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
       enum: ['customer', 'admin'],
       default: 'customer',
     },
+    refreshToken: { type: String, select: false },
+    refreshTokenExpiry: { type: Date, select: false },
   },
   { timestamps: true }
 );

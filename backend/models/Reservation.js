@@ -1,13 +1,11 @@
 const mongoose = require('mongoose');
 
-// Fixed time slots instead of free-form start/end times.
-// This turns "does this overlap with an existing booking?" (hard, error-prone)
-// into "does this exact table+date+slot combination already exist?" (simple).
 const TIME_SLOTS = [
-  '12:00-13:30',
-  '13:30-15:00',
-  '19:00-20:30',
-  '20:30-22:00',
+  '12:00 - 13:30',
+  '13:30 - 15:00',
+  '18:00 - 19:30',
+  '19:30 - 21:00',
+  '21:00 - 22:30',
 ];
 
 const reservationSchema = new mongoose.Schema(
@@ -23,13 +21,13 @@ const reservationSchema = new mongoose.Schema(
       required: true,
     },
     date: {
-      type: String, // stored as 'YYYY-MM-DD' to keep comparisons simple
+      type: String,
       required: true,
     },
     timeSlot: {
       type: String,
-      enum: TIME_SLOTS,
       required: true,
+      enum: TIME_SLOTS,
     },
     guests: {
       type: Number,
@@ -38,27 +36,17 @@ const reservationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['confirmed', 'pending', 'cancelled'],
-      default: 'pending',
+      enum: ['confirmed', 'cancelled'],
+      default: 'confirmed',
     },
   },
   { timestamps: true }
 );
 
-// THE CORE ANTI-DOUBLE-BOOKING MECHANISM.
-// A unique index on (table, date, timeSlot) that only applies to
-// documents where status === 'confirmed'. MongoDB itself will reject
-// a second confirmed reservation for the same table/date/slot combo
-// with a duplicate-key error (code 11000) - even if two requests
-// arrive at the exact same millisecond. This is enforced at the
-// database layer, not just in application code, so it can't be
-// bypassed by a race condition between "check" and "insert".
+// COMPOUND UNIQUE INDEX: Enforces double-booking prevention at DB level
 reservationSchema.index(
   { table: 1, date: 1, timeSlot: 1 },
-  {
-    unique: true,
-    partialFilterExpression: { status: 'confirmed' },
-  }
+  { unique: true, partialFilterExpression: { status: 'confirmed' } }
 );
 
 reservationSchema.statics.TIME_SLOTS = TIME_SLOTS;
