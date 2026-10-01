@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || '';
 
 // Central fetch wrapper: attaches the JWT automatically, parses JSON,
 // and throws a real Error with the server's message on failure so
