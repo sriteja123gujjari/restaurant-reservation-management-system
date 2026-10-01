@@ -7,12 +7,19 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Restore authenticated user session on page refresh/initial load
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       api.getProfile()
-        .then((data) => setUser(data.user || data))
-        .catch(() => localStorage.removeItem('token'))
+        .then((res) => {
+          const userData = res.user || res.data || res;
+          setUser(userData);
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          setUser(null);
+        })
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
@@ -20,12 +27,15 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (credentials) => {
-    const data = await api.login(credentials);
-    if (data.token) {
-      localStorage.setItem('token', data.token);
+    const res = await api.login(credentials);
+    const token = res.token || res.accessToken;
+    const userData = res.user || res.data || res;
+
+    if (token) {
+      localStorage.setItem('token', token);
     }
-    setUser(data.user || data);
-    return data;
+    setUser(userData);
+    return res;
   };
 
   const logout = () => {
@@ -34,13 +44,16 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-// Ensure this hook is declared ONLY ONCE in the file
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
