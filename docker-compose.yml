@@ -1,0 +1,46 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: reservation_mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    # No auth for local dev — never do this in production
+    environment:
+      MONGO_INITDB_DATABASE: reservation_db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: reservation_backend
+    ports:
+      - '5000:5000'
+    environment:
+      PORT: 5000
+      # Points to the mongo service above, not Atlas
+      # Docker Compose puts all services on the same network,
+      # so 'mongo' resolves to the mongo container's IP
+      MONGO_URI: mongodb://mongo:27017/reservation_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 15m
+      ALLOWED_ORIGIN: http://localhost:80
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Vite reads this at BUILD time to embed the API URL
+        VITE_API_URL: http://localhost:5000
+    container_name: reservation_frontend
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
