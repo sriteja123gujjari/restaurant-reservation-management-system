@@ -1,45 +1,54 @@
-import { Navigate, Link } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  if (token) {
-    return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
-  }
+  const handleAction = () => {
+    if (user) {
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/bookings');
+      }
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
-    <div className="flex min-h-[85vh] items-center justify-center px-6">
-      <div className="mx-auto max-w-xl text-center animate-slideup">
-        <div className="inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-100 px-4 py-1.5 mb-6">
-          <div className="h-1.5 w-1.5 rounded-full bg-gold"></div>
-          <span className="text-xs font-semibold text-gold tracking-wide">Now accepting reservations</span>
-        </div>
+    <div className="home-container" style={{ textAlign: 'center', padding: '4rem 1rem' }}>
+      <span className="badge" style={{ background: '#fef3c7', color: '#92400e', padding: '0.25rem 0.75rem', borderRadius: '12px', fontSize: '0.85rem' }}>
+        • Now accepting reservations
+      </span>
 
-        <h1 className="mb-4 font-sans text-4xl md:text-5xl font-bold tracking-tight leading-tight text-gray-900">
-          Book your perfect
-          <br />
-          <span className="text-gold">dining experience</span>
-        </h1>
+      <h1 style={{ fontSize: '2.5rem', marginTop: '1rem' }}>
+        Book your perfect <br />
+        <span style={{ color: '#b34700' }}>dining experience</span>
+      </h1>
 
-        <p className="mx-auto mb-8 max-w-md text-base text-gray-500 leading-relaxed">
-          Reserve your preferred table in under a minute. Browse our interactive floor plan, pick your seat, and lock it in.
-        </p>
+      <p style={{ color: '#666', maxWidth: '500px', margin: '1rem auto' }}>
+        Reserve your preferred table in under a minute. Browse our interactive floor plan, pick your seat, and lock it in.
+      </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/register"
-            className="w-full sm:w-auto rounded-lg bg-gold px-7 py-3 text-sm font-semibold text-white hover:bg-gold-soft transition-colors shadow-sm"
-          >
-            Reserve a table
-          </Link>
-          <Link
-            to="/login"
-            className="w-full sm:w-auto rounded-lg border border-gray-200 px-7 py-3 text-sm font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-colors"
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+        <button
+          onClick={handleAction}
+          style={{ backgroundColor: '#b34700', color: '#fff', border: 'none', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          {user ? 'Go to Booking Dashboard' : 'Reserve a table'}
+        </button>
+
+        {!user && (
+          <button
+            onClick={() => navigate('/login')}
+            style={{ backgroundColor: '#f3f4f6', border: '1px solid #ccc', padding: '0.75rem 1.5rem', borderRadius: '6px', cursor: 'pointer' }}
           >
             Sign in
-          </Link>
-        </div>
+          </button>
+        )}
       </div>
     </div>
   );
