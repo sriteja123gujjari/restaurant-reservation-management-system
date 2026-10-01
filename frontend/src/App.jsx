@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -8,62 +8,56 @@ import CustomerDashboard from './pages/CustomerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFound from './pages/NotFound';
 
-// Protected Route Wrapper
-function ProtectedRoute({ children, allowedRoles }) {
-  const { user, loading } = useAuth();
-
-  if (loading) return <div>Loading...</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
 export default function App() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <Routes>
-      {/* Root Route: Shows Home for guests, Dashboard for logged-in users */}
-      <Route
-        path="/"
-        element={
-          !user ? (
-            <Home />
-          ) : user.role === 'admin' ? (
-            <Navigate to="/admin" replace />
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb', color: '#111827' }}>
+      {/* Top Header / Navbar */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 2rem', backgroundColor: '#ffffff', borderBottom: '1px solid #e5e7eb' }}>
+        <Link to="/" style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#b34700', textDecoration: 'none' }}>
+          ReserveTable
+        </Link>
+
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {user ? (
+            <>
+              <span style={{ fontSize: '0.9rem', backgroundColor: '#ecfdf5', color: '#047857', padding: '0.25rem 0.75rem', borderRadius: '12px' }}>
+                ● {user.name || user.email} ({user.role?.toUpperCase() || 'CUSTOMER'})
+              </span>
+              <button
+                onClick={handleSignOut}
+                style={{ background: 'none', border: 'none', color: '#4b5563', cursor: 'pointer', fontWeight: '500' }}
+              >
+                Sign out
+              </button>
+            </>
           ) : (
-            <CustomerDashboard />
-          )
-        }
-      />
+            <>
+              <Link to="/login" style={{ textDecoration: 'none', color: '#4b5563', fontWeight: '500' }}>Sign in</Link>
+              <Link to="/login" style={{ textDecoration: 'none', backgroundColor: '#b34700', color: '#fff', padding: '0.5rem 1rem', borderRadius: '6px', fontWeight: 'bold' }}>RESERVE TABLE</Link>
+            </>
+          )}
+        </div>
+      </header>
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* Customer Booking Dashboard */}
-      <Route
-        path="/bookings"
-        element={
-          <ProtectedRoute allowedRoles={['customer']}>
-            <CustomerDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Admin Dashboard */}
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+      {/* Main Content Area */}
+      <main>
+        <Routes>
+          <Route path="/" element={user ? (user.role === 'admin' ? <AdminDashboard /> : <CustomerDashboard />) : <Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/bookings" element={<CustomerDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+    </div>
   );
 }
