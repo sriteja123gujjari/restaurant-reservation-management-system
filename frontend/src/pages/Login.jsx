@@ -1,26 +1,33 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Adjust path if needed
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+
+  const { user, login } = useAuth();
   const navigate = useNavigate();
 
+  // Redirect automatically if user is already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
   const handleSubmit = async (e) => {
-    if (e) e.preventDefault();
+    e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
-      const data = await api.login({ email, password });
-      login(data.token, data.user);
-      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+      await login({ email, password });
+      navigate('/', { replace: true });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -30,101 +37,82 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const data = await api.login({ email: demoEmail, password: demoPassword });
-      login(data.token, data.user);
-      navigate(data.user.role === 'admin' ? '/admin' : '/dashboard');
+      await login({ email: demoEmail, password: demoPassword });
+      navigate('/', { replace: true });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Quick login failed');
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto flex min-h-[85vh] max-w-sm flex-col justify-center px-6 py-12 animate-slideup">
-      <div>
-        <h1 className="mb-1 font-sans text-2xl font-bold text-gray-900">
-          Welcome back
-        </h1>
-        <p className="mb-8 text-sm text-gray-500">
-          Sign in to manage your reservations
-        </p>
+    <div className="login-container">
+      <h2>Welcome back</h2>
+      <p>Sign in to manage your reservations</p>
 
-        {error && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 font-medium">
-            {error}
+      {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button type="submit" disabled={loading} className="btn-primary">
+          {loading ? 'Signing in...' : 'Sign in'}
+        </button>
+      </form>
+
+      <p className="register-prompt">
+        Don't have an account? <Link to="/register">Register</Link>
+      </p>
+
+      <div className="quick-access-section" style={{ marginTop: '2rem' }}>
+        <h4>REVIEWER QUICK ACCESS</h4>
+        <div className="quick-card" style={{ border: '1px solid #ddd', padding: '1rem', marginBottom: '0.5rem' }}>
+          <div>
+            <strong>Customer Demo</strong>
+            <div>customer@demo.com</div>
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-gray-700">Email</span>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30"
-              placeholder="you@example.com"
-            />
-          </label>
-
-          <label className="flex flex-col gap-1.5">
-            <span className="text-sm font-medium text-gray-700">Password</span>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors focus:border-gold focus:ring-1 focus:ring-gold/30"
-              placeholder="••••••••"
-            />
-          </label>
-
           <button
-            type="submit"
+            type="button"
+            onClick={() => handleQuickLogin('customer@demo.com', 'password123')}
             disabled={loading}
-            className="mt-1 rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-white hover:bg-gold-soft disabled:opacity-50 transition-colors"
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            LOGIN →
           </button>
-        </form>
+        </div>
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-gold font-medium hover:underline">
-            Register
-          </Link>
-        </p>
-
-        {/* Quick access for reviewers */}
-        <div className="mt-10 border-t border-gray-100 pt-6">
-          <p className="mb-3 text-xs font-medium text-gray-400 text-center uppercase tracking-wider">
-            Reviewer Quick Access
-          </p>
-          <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('customer@demo.com', 'customer123')}
-              className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-4 py-3 text-left hover:border-gold/40 hover:bg-amber-50/30 transition-colors"
-            >
-              <div>
-                <span className="text-sm font-semibold text-gray-900 block">Customer Demo</span>
-                <span className="text-xs text-gray-400 font-mono">customer@demo.com</span>
-              </div>
-              <span className="text-[10px] uppercase tracking-wide text-gold font-bold">Login →</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('admin@demo.com', 'admin123')}
-              className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/50 px-4 py-3 text-left hover:border-gold/40 hover:bg-amber-50/30 transition-colors"
-            >
-              <div>
-                <span className="text-sm font-semibold text-gray-900 block">Admin Demo</span>
-                <span className="text-xs text-gray-400 font-mono">admin@demo.com</span>
-              </div>
-              <span className="text-[10px] uppercase tracking-wide text-gold font-bold">Login →</span>
-            </button>
+        <div className="quick-card" style={{ border: '1px solid #ddd', padding: '1rem' }}>
+          <div>
+            <strong>Admin Demo</strong>
+            <div>admin@demo.com</div>
           </div>
+          <button
+            type="button"
+            onClick={() => handleQuickLogin('admin@demo.com', 'admin123')}
+            disabled={loading}
+          >
+            LOGIN →
+          </button>
         </div>
       </div>
     </div>
