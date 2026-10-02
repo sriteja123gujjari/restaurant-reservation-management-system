@@ -27,6 +27,13 @@ const errorHandler = (err, req, res, next) => {
     return res.status(400).json({ message: messages.join(', ') });
   }
 
+  // Mongoose invalid ObjectId / cast errors
+  if (err.name === 'CastError') {
+    return res.status(400).json({
+      message: `Invalid identifier format for ${err.path || 'record'}.`,
+    });
+  }
+
   const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode).json({
     message: err.message || 'Server error',

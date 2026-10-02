@@ -14,18 +14,21 @@ const FALLBACK_SLOTS = [
   '21:00 - 22:30',
 ];
 
-// Curated fallback tables if backend initial load is pending
+// Helper to verify a valid 24-character hexadecimal MongoDB ObjectId
+const isMongoId = (id) => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
+
+// Curated fallback tables if backend initial load is pending (never inject fake ObjectIds)
 const DEFAULT_TABLES = [
-  { _id: 'def-1', tableNumber: 1, capacity: 2 },
-  { _id: 'def-2', tableNumber: 2, capacity: 2 },
-  { _id: 'def-3', tableNumber: 3, capacity: 2 },
-  { _id: 'def-4', tableNumber: 4, capacity: 4 },
-  { _id: 'def-5', tableNumber: 5, capacity: 4 },
-  { _id: 'def-6', tableNumber: 6, capacity: 4 },
-  { _id: 'def-7', tableNumber: 7, capacity: 4 },
-  { _id: 'def-8', tableNumber: 8, capacity: 6 },
-  { _id: 'def-9', tableNumber: 9, capacity: 6 },
-  { _id: 'def-10', tableNumber: 10, capacity: 8 },
+  { tableNumber: 1, capacity: 2 },
+  { tableNumber: 2, capacity: 2 },
+  { tableNumber: 3, capacity: 2 },
+  { tableNumber: 4, capacity: 4 },
+  { tableNumber: 5, capacity: 4 },
+  { tableNumber: 6, capacity: 4 },
+  { tableNumber: 7, capacity: 4 },
+  { tableNumber: 8, capacity: 6 },
+  { tableNumber: 9, capacity: 6 },
+  { tableNumber: 10, capacity: 8 },
 ];
 
 // Quick suggestion chips for special dining requests
@@ -132,6 +135,16 @@ export default function CustomerDashboard() {
         const raw = await api.getAvailableTables(selectedDate, selectedTimeSlot);
         const list = parseTableList(raw);
         setAvailableTables(list);
+        if (list.length > 0) {
+          // Sync real DB documents into allTables so all tables have genuine ObjectIds
+          setAllTables((prev) => {
+            const map = new Map(list.map((t) => [Number(t.tableNumber || t.number), t]));
+            return prev.map((t) => {
+              const num = Number(t.tableNumber || t.number);
+              return map.has(num) ? { ...t, ...map.get(num) } : t;
+            });
+          });
+        }
       } else {
         setAvailableTables(allTables);
       }
@@ -199,19 +212,28 @@ export default function CustomerDashboard() {
   const floorPlanTables = useMemo(() => {
     const baseList = allTables.length > 0 ? allTables : DEFAULT_TABLES;
     return baseList.map((table) => {
-      const id = (table._id || table.id)?.toString();
-      const numStr = (table.tableNumber || table.number)?.toString();
+      const num = Number(table.tableNumber || table.number);
+      // Prefer real MongoDB document from availableTables or allTables
+      const dbMatch =
+        availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
+        allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
+
+      const effectiveTable = dbMatch ? { ...table, ...dbMatch } : table;
+      const id = (effectiveTable._id || effectiveTable.id)?.toString();
+      const numStr = String(num);
+
       const isFree =
         availableTables.length === 0
           ? true
           : availableTableIdSet.has(id) || availableTableIdSet.has(numStr);
+
       const isSelected =
         selectedTable &&
-        ((selectedTable._id || selectedTable.id)?.toString() === id ||
-          (selectedTable.tableNumber || selectedTable.number)?.toString() === numStr);
+        ((selectedTable._id && (selectedTable._id === id || selectedTable.id === id)) ||
+          Number(selectedTable.tableNumber || selectedTable.number) === num);
 
       return {
-        ...table,
+        ...effectiveTable,
         isFree,
         isSelected,
       };
@@ -227,11 +249,18 @@ export default function CustomerDashboard() {
       notify(`Table #${table.tableNumber || table.number} is already booked for this slot.`, 'info');
       return;
     }
-    setSelectedTable(table);
-    if (Number(partySize) > (table.capacity || 2)) {
-      setPartySize(table.capacity || 2);
+
+    const num = Number(table.tableNumber || table.number);
+    const dbMatch =
+      availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
+      allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
+
+    const targetTable = dbMatch ? { ...table, ...dbMatch } : table;
+    setSelectedTable(targetTable);
+    if (Number(partySize) > (targetTable.capacity || 2)) {
+      setPartySize(targetTable.capacity || 2);
     }
-    notify(`Table #${table.tableNumber || table.number} selected.`, 'info');
+    notify(`Table #${targetTable.tableNumber || targetTable.number} selected.`, 'info');
   };
 
   const handleAppendRequest = (chip) => {
@@ -266,8 +295,18 @@ export default function CustomerDashboard() {
         .filter(Boolean)
         .join(' | ');
 
+      // Resolve genuine MongoDB ObjectId, falling back to tableNumber if needed
+      let finalTableId = selectedTable._id || selectedTable.id;
+      if (!isMongoId(finalTableId)) {
+        const num = Number(selectedTable.tableNumber || selectedTable.number);
+        const match =
+          availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
+          allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
+        finalTableId = match?._id || num;
+      }
+
       const payload = {
-        tableId: selectedTable._id || selectedTable.id,
+        tableId: finalTableId,
         date: selectedDate,
         timeSlot: selectedTimeSlot,
         guests: Number(partySize),

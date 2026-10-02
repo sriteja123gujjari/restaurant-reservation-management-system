@@ -24,7 +24,25 @@ const createReservation = async (req, res, next) => {
       return res.status(400).json({ message: 'Cannot book a date in the past' });
     }
 
-    const table = await Table.findById(tableId);
+    const mongoose = require('mongoose');
+    let table = null;
+
+    // 1. Try finding by ObjectId if tableId is a valid 24-char hex string
+    if (mongoose.Types.ObjectId.isValid(tableId)) {
+      table = await Table.findById(tableId);
+    }
+
+    // 2. Fallback: If tableId was not a valid ObjectId (e.g. "def-1", "1", or raw number),
+    // resolve by tableNumber from the database
+    if (!table) {
+      const parsedNum = typeof tableId === 'number'
+        ? tableId
+        : parseInt(String(tableId).replace(/\D/g, ''), 10);
+      if (!isNaN(parsedNum)) {
+        table = await Table.findOne({ tableNumber: parsedNum });
+      }
+    }
+
     if (!table) {
       return res.status(404).json({ message: 'Table not found' });
     }
@@ -36,14 +54,10 @@ const createReservation = async (req, res, next) => {
       });
     }
 
-    // This is the line that can throw a MongoDB duplicate-key error (11000)
-    // if another confirmed reservation already holds this table/date/slot.
-    // That error is caught by middleware/errorHandler.js and turned into
-    // a clean 409 Conflict response - this is the actual double-booking
-    // prevention at work, not just a pre-check.
+    // Always reference table._id (the genuine MongoDB ObjectId) to guarantee referential integrity
     const reservation = await Reservation.create({
       user: req.user._id,
-      table: tableId,
+      table: table._id,
       date,
       timeSlot,
       guests,
