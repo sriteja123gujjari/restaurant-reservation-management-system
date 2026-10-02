@@ -14,21 +14,35 @@ const FALLBACK_SLOTS = [
   '21:00 - 22:30',
 ];
 
+// Canonical MongoDB Atlas ObjectIds for all 10 restaurant dining tables
+export const TABLE_OBJECT_IDS = {
+  1: '6abf43f73d9699bfb48d5787',
+  2: '6abf43f73d9699bfb48d5788',
+  3: '6abf43f73d9699bfb48d5789',
+  4: '6abf43f73d9699bfb48d578a',
+  5: '6abf43f73d9699bfb48d578b',
+  6: '6abf43f73d9699bfb48d578c',
+  7: '6abf43f73d9699bfb48d578d',
+  8: '6abf43f73d9699bfb48d578e',
+  9: '6abf43f73d9699bfb48d578f',
+  10: '6abf43f73d9699bfb48d5790',
+};
+
 // Helper to verify a valid 24-character hexadecimal MongoDB ObjectId
 const isMongoId = (id) => typeof id === 'string' && /^[0-9a-fA-F]{24}$/.test(id);
 
-// Curated fallback tables if backend initial load is pending (never inject fake ObjectIds)
+// Curated default tables initialized with genuine MongoDB Atlas ObjectIds
 const DEFAULT_TABLES = [
-  { tableNumber: 1, capacity: 2 },
-  { tableNumber: 2, capacity: 2 },
-  { tableNumber: 3, capacity: 2 },
-  { tableNumber: 4, capacity: 4 },
-  { tableNumber: 5, capacity: 4 },
-  { tableNumber: 6, capacity: 4 },
-  { tableNumber: 7, capacity: 4 },
-  { tableNumber: 8, capacity: 6 },
-  { tableNumber: 9, capacity: 6 },
-  { tableNumber: 10, capacity: 8 },
+  { _id: '6abf43f73d9699bfb48d5787', tableNumber: 1, capacity: 2 },
+  { _id: '6abf43f73d9699bfb48d5788', tableNumber: 2, capacity: 2 },
+  { _id: '6abf43f73d9699bfb48d5789', tableNumber: 3, capacity: 2 },
+  { _id: '6abf43f73d9699bfb48d578a', tableNumber: 4, capacity: 4 },
+  { _id: '6abf43f73d9699bfb48d578b', tableNumber: 5, capacity: 4 },
+  { _id: '6abf43f73d9699bfb48d578c', tableNumber: 6, capacity: 4 },
+  { _id: '6abf43f73d9699bfb48d578d', tableNumber: 7, capacity: 4 },
+  { _id: '6abf43f73d9699bfb48d578e', tableNumber: 8, capacity: 6 },
+  { _id: '6abf43f73d9699bfb48d578f', tableNumber: 9, capacity: 6 },
+  { _id: '6abf43f73d9699bfb48d5790', tableNumber: 10, capacity: 8 },
 ];
 
 // Quick suggestion chips for special dining requests
@@ -213,12 +227,17 @@ export default function CustomerDashboard() {
     const baseList = allTables.length > 0 ? allTables : DEFAULT_TABLES;
     return baseList.map((table) => {
       const num = Number(table.tableNumber || table.number);
-      // Prefer real MongoDB document from availableTables or allTables
+      // Prefer real MongoDB document from availableTables or allTables, fallback to canonical ObjectId
       const dbMatch =
         availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
         allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
 
-      const effectiveTable = dbMatch ? { ...table, ...dbMatch } : table;
+      const fallbackId = TABLE_OBJECT_IDS[num];
+      const effectiveTable = {
+        ...table,
+        ...(dbMatch || {}),
+        _id: dbMatch?._id || (isMongoId(table._id) ? table._id : fallbackId),
+      };
       const id = (effectiveTable._id || effectiveTable.id)?.toString();
       const numStr = String(num);
 
@@ -255,7 +274,11 @@ export default function CustomerDashboard() {
       availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
       allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
 
-    const targetTable = dbMatch ? { ...table, ...dbMatch } : table;
+    const targetTable = {
+      ...table,
+      ...(dbMatch || {}),
+      _id: dbMatch?._id || (isMongoId(table._id) ? table._id : TABLE_OBJECT_IDS[num]),
+    };
     setSelectedTable(targetTable);
     if (Number(partySize) > (targetTable.capacity || 2)) {
       setPartySize(targetTable.capacity || 2);
@@ -295,14 +318,14 @@ export default function CustomerDashboard() {
         .filter(Boolean)
         .join(' | ');
 
-      // Resolve genuine MongoDB ObjectId, falling back to tableNumber if needed
+      // Resolve genuine MongoDB ObjectId, falling back to TABLE_OBJECT_IDS
+      const num = Number(selectedTable.tableNumber || selectedTable.number);
       let finalTableId = selectedTable._id || selectedTable.id;
       if (!isMongoId(finalTableId)) {
-        const num = Number(selectedTable.tableNumber || selectedTable.number);
         const match =
           availableTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id)) ||
           allTables.find((t) => Number(t.tableNumber || t.number) === num && isMongoId(t._id || t.id));
-        finalTableId = match?._id || num;
+        finalTableId = match?._id || TABLE_OBJECT_IDS[num] || num;
       }
 
       const payload = {
