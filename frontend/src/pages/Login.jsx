@@ -48,87 +48,105 @@ export default function Login() {
   };
 
   return (
-    <div className="login-container" style={{ maxWidth: '480px', margin: '2rem auto', padding: '1.5rem' }}>
-      <h2>Welcome back</h2>
-      <p style={{ color: '#666', marginBottom: '1.5rem' }}>Sign in to manage your reservations</p>
-
-      {error && (
-        <div className="error-message" style={{ color: '#d9534f', backgroundColor: '#fdf7f7', padding: '0.75rem', borderRadius: '4px', marginBottom: '1rem' }}>
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className="form-group" style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-            style={{ width: '100%', padding: '0.6rem', border: '1px solid #ccc', borderRadius: '4px' }}
-          />
+    <div className="min-h-[80vh] flex flex-col justify-center px-4 sm:px-6 lg:px-8 py-12 animate-slideup">
+      <div className="max-w-md w-full mx-auto bg-white rounded-2xl border border-slate-200/90 p-8 shadow-card">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-extrabold font-heading text-slate-900">
+            Sign In
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Access your ReservePrime floor plan & bookings
+          </p>
         </div>
 
-        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            style={{ width: '100%', padding: '0.6rem', border: '1px solid #ccc', borderRadius: '4px' }}
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: '100%', padding: '0.75rem', backgroundColor: '#b34700', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          {loading ? 'Signing in...' : 'Sign in'}
-        </button>
-      </form>
-
-      <p className="register-prompt" style={{ marginTop: '1rem', textAlign: 'center' }}>
-        Don't have an account? <Link to="/register" style={{ color: '#b34700' }}>Register</Link>
-      </p>
-
-      <div className="quick-access-section" style={{ marginTop: '2.5rem', borderTop: '1px solid #eee', paddingTop: '1.5rem' }}>
-        <h4 style={{ fontSize: '0.85rem', color: '#888', letterSpacing: '1px', marginBottom: '1rem' }}>
-          REVIEWER QUICK ACCESS
-        </h4>
-
-        <div className="quick-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #eee', borderRadius: '6px', padding: '1rem', marginBottom: '0.75rem' }}>
-          <div>
-            <strong>Customer Demo</strong>
-            <div style={{ fontSize: '0.85rem', color: '#666' }}>customer@demo.com</div>
+        {error && (
+          <div className="mb-5 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-xs text-orange-800 font-semibold">
+            {error}
           </div>
-          <button
-            type="button"
-            onClick={() => handleQuickLogin('customer@demo.com', 'customer123')}
-            disabled={loading}
-            style={{ background: 'none', border: 'none', color: '#b34700', fontWeight: 'bold', cursor: 'pointer' }}
-          >
-            LOGIN →
-          </button>
-        </div>
+        )}
 
-        <div className="quick-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid #eee', borderRadius: '6px', padding: '1rem' }}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <strong>Admin Demo</strong>
-            <div style={{ fontSize: '0.85rem', color: '#666' }}>admin@demo.com</div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-district focus:border-transparent font-medium shadow-xs transition-all"
+            />
           </div>
+
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-district focus:border-transparent font-medium shadow-xs transition-all"
+            />
+          </div>
+
           <button
-            type="button"
-            onClick={() => handleQuickLogin('admin@demo.com', 'admin123')}
+            type="submit"
             disabled={loading}
-            style={{ background: 'none', border: 'none', color: '#b34700', fontWeight: 'bold', cursor: 'pointer' }}
+            className="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-district hover:bg-orange-600 active:scale-[0.99] transition-all mt-2"
           >
-            LOGIN →
+            {loading ? 'Signing In...' : 'Sign In'}
           </button>
+        </form>
+
+        <p className="mt-5 text-center text-xs text-slate-500">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-district font-bold hover:underline">
+            Register here
+          </Link>
+        </p>
+
+        {/* Demo Accounts */}
+        <div className="mt-8 border-t border-slate-100 pt-5">
+          <div className="text-[11px] font-bold tracking-wider uppercase text-slate-400 mb-2.5 font-mono">
+            Quick Demo Access
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+              <div>
+                <div className="text-xs font-bold text-slate-800">Demo Customer</div>
+                <div className="text-[11px] text-slate-500 font-mono">customer@demo.com</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('customer@demo.com', 'customer123')}
+                disabled={loading}
+                className="text-xs font-bold text-district hover:underline px-3 py-1 rounded-md bg-white border border-slate-200"
+              >
+                Log In
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50">
+              <div>
+                <div className="text-xs font-bold text-slate-800">Demo Admin</div>
+                <div className="text-[11px] text-slate-500 font-mono">admin@demo.com</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('admin@demo.com', 'admin123')}
+                disabled={loading}
+                className="text-xs font-bold text-district hover:underline px-3 py-1 rounded-md bg-white border border-slate-200"
+              >
+                Log In
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

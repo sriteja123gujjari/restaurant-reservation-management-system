@@ -8,10 +8,14 @@ const User = require('../models/User');
 const tables = [
   { tableNumber: 1, capacity: 2 },
   { tableNumber: 2, capacity: 2 },
-  { tableNumber: 3, capacity: 4 },
+  { tableNumber: 3, capacity: 2 },
   { tableNumber: 4, capacity: 4 },
-  { tableNumber: 5, capacity: 6 },
-  { tableNumber: 6, capacity: 8 },
+  { tableNumber: 5, capacity: 4 },
+  { tableNumber: 6, capacity: 4 },
+  { tableNumber: 7, capacity: 4 },
+  { tableNumber: 8, capacity: 6 },
+  { tableNumber: 9, capacity: 6 },
+  { tableNumber: 10, capacity: 8 },
 ];
 
 // Demo accounts so reviewers (and you, while testing) can log in

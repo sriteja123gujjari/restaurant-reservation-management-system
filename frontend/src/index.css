@@ -7,20 +7,21 @@ html {
 }
 
 body {
-  background-color: #F9FAFB;
-  color: #111827;
-  font-family: 'IBM Plex Sans', sans-serif;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scrollbar */
+/* Custom Modern ReservePrime Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #B45309; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #ea580c; }
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid #B45309;
+  outline: 2px solid #ea580c;
   outline-offset: 2px;
 }
 
@@ -32,36 +33,126 @@ body {
   }
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes pulseOrange {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.45); }
+  50% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
 }
 
-.animate-slideup {
-  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+.pulse-coral {
+  animation: pulseOrange 2s infinite;
 }
 
-/* Ticket perforation edges */
+.pulse-gold {
+  animation: pulseCoral 2s infinite;
+}
+
+@keyframes floatOrb1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(50px, -40px) scale(1.12);
+  }
+  66% {
+    transform: translate(-35px, 30px) scale(0.92);
+  }
+}
+
+@keyframes floatOrb2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(-55px, 35px) scale(1.1);
+  }
+  66% {
+    transform: translate(40px, -45px) scale(0.94);
+  }
+}
+
+@keyframes floatOrb3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(35px, 40px) scale(1.18);
+  }
+}
+
+@keyframes rotateSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes driftSoft {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(2deg);
+  }
+}
+
+.animate-float-orb-1 {
+  animation: floatOrb1 16s ease-in-out infinite;
+}
+
+.animate-float-orb-2 {
+  animation: floatOrb2 20s ease-in-out infinite;
+}
+
+.animate-float-orb-3 {
+  animation: floatOrb3 14s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotateSlow 45s linear infinite;
+}
+
+.animate-drift-soft {
+  animation: driftSoft 8s ease-in-out infinite;
+}
+
+/* Floor blueprint architectural patterns */
+.floor-blueprint {
+  background-color: #0d131f;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.04) 0%, transparent 80%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+}
+
+.floor-terrace {
+  background-color: #0b1c18;
+  background-image: 
+    radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+    linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 28px 28px, 28px 28px;
+}
+
+.terrace-wood-deck {
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(217, 119, 6, 0.04) 0px,
+    rgba(217, 119, 6, 0.04) 2px,
+    transparent 2px,
+    transparent 16px
+  );
+}
+
 .ticket-edge { position: relative; }
 .ticket-edge::before {
   content: '';
   position: absolute;
   top: -1px; left: 0; right: 0;
-  height: 1px;
-  background-image: radial-gradient(circle, #FFFFFF 2px, transparent 2.5px);
-  background-size: 14px 1px;
+  height: 2px;
+  background-image: radial-gradient(circle, #faf7f2 3px, transparent 3.5px);
+  background-size: 16px 2px;
   background-repeat: repeat-x;
-}
-
-.ticket-edge-bottom { position: relative; }
-.ticket-edge-bottom::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 0; right: 0;
-  height: 1px;
-  background-image: radial-gradient(circle, #FFFFFF 2px, transparent 2.5px);
-  background-size: 14px 1px;
-  background-repeat: repeat-x;
-}
-
-.stamp { transform: rotate(-8deg); }
+}

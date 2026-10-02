@@ -27,7 +27,7 @@ export function ToastProvider({ children }) {
   }, []);
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ showToast, addToast: showToast }}>
       {children}
       {/* Toast container */}
       <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none">
@@ -37,7 +37,7 @@ export function ToastProvider({ children }) {
             className={`pointer-events-auto flex items-start justify-between gap-3 rounded-xl border p-4 shadow-lg backdrop-blur-sm transition-all duration-300 animate-slideup ${t.type === 'success'
               ? 'border-emerald-100 bg-emerald-50/95 text-emerald-800'
               : t.type === 'error'
-                ? 'border-red-100 bg-red-50/95 text-red-800'
+                ? 'border-orange-200 bg-orange-50/95 text-orange-900'
                 : 'border-blue-100 bg-blue-50/95 text-blue-800'
               }`}
           >
@@ -48,7 +48,7 @@ export function ToastProvider({ children }) {
                 </svg>
               )}
               {t.type === 'error' && (
-                <svg className="h-5 w-5 text-red-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="h-5 w-5 text-orange-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}

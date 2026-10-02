@@ -2,8 +2,10 @@ const express = require('express');
 const cors = require('cors');
 
 // Import routes & middleware
-const authRoutes = require('./routes/authRoutes'); // Adjust paths if needed
+const authRoutes = require('./routes/authRoutes');
+const tableRoutes = require('./routes/tableRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -18,7 +20,9 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/tables', tableRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Centralized Error Handler
 app.use(errorHandler);
